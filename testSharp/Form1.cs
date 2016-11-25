@@ -22,46 +22,47 @@ namespace testSharp
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var client = new RestClient("http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?");
-            var request = new RestRequest();
+            try {
+                //getting id of game from input box
+                int gameId = 0;
+                try
+                {
+                    gameId = int.Parse(txtGameId.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show("Game ID must be number");
+                }
 
-            // Set up and build parameter list for this service
+                var client = new RestClient("http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?");
+                var request = new RestRequest();
 
-            //string Myuser = "test";
-            //string myMethod = "user.getTopArtists";
-            //request.AddParameter("method", myMethod);
-            //request.AddParameter("user", Myuser);
-            //string myKey = "581cca30b41a4cc0d5b3eb59d502b651";
-            //request.AddParameter("api_key", myKey);
-            //request.AddParameter("limit", 10);
-            //request.AddParameter("format", "json");
-            //string key = "71897F1E822664717BC6FEFAE509510A";
-            //request.AddParameter("api key", key);
-            request.AddParameter("appid", "440");
-            request.AddParameter("count", "3");
-            request.AddParameter("maxlength", "300");
-            request.AddParameter("format", "json");
+                // Set up and build parameter list for this service
+                //string key = "71897F1E822664717BC6FEFAE509510A";
+                //request.AddParameter("api key", key);
+                request.AddParameter("appid", gameId);
+                request.AddParameter("count", "3");
+                request.AddParameter("maxlength", "300");
+                request.AddParameter("format", "json");
 
-            // Service call
-
-            var response = client.Execute(request);
+                // Service call
+                var response = client.Execute(request);
 
 
-            JsonDeserializer deserializer = new JsonDeserializer();
+                JsonDeserializer deserializer = new JsonDeserializer();
 
-            // have a look at the structure of the json
+                var temp = new RootObject();
+                temp = deserializer.Deserialize<RootObject>(response);
+                var news = temp.appNews.newsItems;
 
-            MessageBox.Show(response.Content);
-
-            var temp = new RootObject();
-            temp = deserializer.Deserialize<RootObject>(response);
-            var news = temp.appNews.newsItems;
-
-            foreach(newsitems n in news)
+                foreach (newsitems n in news)
+                {
+                    MessageBox.Show(n.contents);
+                }
+            }catch(Exception ex)
             {
-                MessageBox.Show(n.contents);
+                MessageBox.Show("Error");
             }
-
         }
 
         public class appnews{
