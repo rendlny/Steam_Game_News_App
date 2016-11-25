@@ -53,7 +53,14 @@ namespace testSharp
 
             MessageBox.Show(response.Content);
 
-            var temp = deserializer.Deserialize<RootObject>(response); 
+            var temp = new RootObject();
+            temp = deserializer.Deserialize<RootObject>(response);
+            var news = temp.appNews.newsItems;
+
+            foreach(newsitems n in news)
+            {
+                MessageBox.Show(n.contents);
+            }
 
         }
 
@@ -64,7 +71,7 @@ namespace testSharp
 
         public class newsitems
         {
-            public int gid { get; set; }
+            public string gid { get; set; }
             public string title { get; set; }
             public string url { get; set; }
             public Boolean is_external_url { get; set; }
