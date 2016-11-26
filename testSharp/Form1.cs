@@ -94,7 +94,12 @@ namespace testSharp
             public string toString()
             {
                 var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(Math.Round(date / 1000d)).ToLocalTime();
-                return "" + title + "\r\n" + dt + "\r\nAuthor: " + author + "\r\n\r\n" + contents;
+                if (author=="" || author == null) {
+                    return "" + title + "\r\n" + dt + "\r\n\r\n" + contents;
+                }else
+                {
+                    return "" + title + "\r\n" + dt + "\r\nAuthor: " + author + "\r\n\r\n" + contents;
+                }
             }
         }
         public class RootObject
