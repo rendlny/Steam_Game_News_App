@@ -21,6 +21,35 @@ namespace testSharp
         public Form1()
         {
             InitializeComponent();
+            //REST to get my recently played games which I'll use to fill the combo box
+            var client = new RestClient("http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/");
+            var request = new RestRequest();
+
+            //parameter setup
+            request.AddParameter("key", "71897F1E822664717BC6FEFAE509510A");
+            request.AddParameter("steamid", "76561198165275807");
+            request.AddParameter("count", "5");
+            request.AddParameter("format", "json");
+
+            //SERvice call
+            var response = client.Execute(request);
+
+            JsonDeserializer deserializer = new JsonDeserializer();
+            MessageBox.Show(response.Content);
+            //setting up contents or response neatly
+            var temp = new rootObject2();
+            temp = deserializer.Deserialize<rootObject2>(response);
+            var games = temp.res.gamesList;
+
+            string[] allGames = new string[games.Count + 1];
+            int totalGames = games.Count;
+
+            for (int i = 0; i < games.Count; i++)
+            {
+                allGames[i] = games[i].toString();
+                MessageBox.Show(allGames[i]);
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -28,9 +57,12 @@ namespace testSharp
             try {
                 //initaliazing gameId
                 int gameId = 0;
+
+                
+                //SECOND REST -- SECOND REST -- SECOND REST -- SECOND REST -- SECOND REST -- SECOND REST -- 
+
                 //getting id of game from input box
                 gameId = int.Parse(txtGameId.Text);
-                
 
                 //client and request setup
                 var client = new RestClient("http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?");
@@ -46,35 +78,35 @@ namespace testSharp
 
                 // Service call
                 var response = client.Execute(request);
-                
-                JsonDeserializer deserializer = new JsonDeserializer();
-                //setting up contents or response neatly
-                var temp = new RootObject();
-                temp = deserializer.Deserialize<RootObject>(response);
-                var news = temp.appNews.newsItems;
 
-                newsArticles = new string[news.Count+1];
+                var deserializer = new JsonDeserializer();
+                //setting up contents or response neatly
+                var temp2 = new RootObject();
+                temp2 = deserializer.Deserialize<RootObject>(response);
+                var news = temp2.appNews.newsItems;
+
+                newsArticles = new string[news.Count + 1];
                 totalArticles = news.Count;
                 currArticle = 0;
-                
-                for(int i = 0; i < news.Count; i++){
+
+                for (int i = 0; i < news.Count; i++) {
                     newsArticles[i] = news[i].toString();
                 }
-                
-                
+
+
                 txtNewsBox.Text = newsArticles[currArticle];
                 labelPageNum.Text = (currArticle + 1) + "/" + totalArticles;
             }
             catch (FormatException)
             {
                 MessageBox.Show("Game ID must be number");
-            }catch(NullReferenceException nullEx)
+            } catch (NullReferenceException nullEx)
             {
                 MessageBox.Show("No Game with that id");
             }
         }
 
-        public class appnews{
+        public class appnews {
             public int appid { get; set; }
             public List<newsitems> newsItems { get; set; }
         }
@@ -86,7 +118,7 @@ namespace testSharp
             public string url { get; set; }
             public Boolean is_external_url { get; set; }
             public string author { get; set; }
-            public string  contents { get; set; }
+            public string contents { get; set; }
             public string feedlabel { get; set; }
             public int date { get; set; }
             public string feedname { get; set; }
@@ -94,9 +126,9 @@ namespace testSharp
             public string toString()
             {
                 var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(Math.Round(date / 1000d)).ToLocalTime();
-                if (author=="" || author == null) {
+                if (author == "" || author == null) {
                     return "" + title + "\r\n" + dt + "\r\n\r\n" + contents;
-                }else
+                } else
                 {
                     return "" + title + "\r\n" + dt + "\r\nAuthor: " + author + "\r\n\r\n" + contents;
                 }
@@ -107,14 +139,41 @@ namespace testSharp
             public appnews appNews { get; set; }
         }
 
-        private void btnNext_Click(object sender, EventArgs e)
+        public class resp
+        {
+            public int total_count { get; set; }
+            public List<games> gamesList { get; set; }
+        }
+
+        public class rootObject2{
+            public resp res { get; set; }
+        }
+
+        
+
+        public class games
+        {
+            public int appid { get; set; }
+            public string name { get; set; }
+            public int playtime_2weeks { get; set; }
+            public int playtime_forever { get; set; }
+            public string img_icon_url { get; set; }
+            public string img_logo_url { get; set; }
+
+            public string toString()
+            {
+                return "name= " + name;
+            }
+        }
+
+private void btnNext_Click(object sender, EventArgs e)
         {
             if (totalArticles >= 0)
             {
-                if (currArticle == totalArticles-1)
+                if (currArticle == totalArticles - 1)
                 {
                     currArticle = 0;
-                }else
+                } else
                 {
                     currArticle = currArticle + 1;
                 }
@@ -130,7 +189,7 @@ namespace testSharp
                 if (currArticle == 0)
                 {
                     currArticle = totalArticles - 1;
-                }else
+                } else
                 {
                     currArticle = currArticle - 1;
                 }
@@ -139,4 +198,5 @@ namespace testSharp
             }
         }
     }
-}
+ }
+    
