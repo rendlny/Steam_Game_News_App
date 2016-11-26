@@ -15,6 +15,9 @@ namespace testSharp
 {
     public partial class Form1 : Form
     {
+        int currArticle = -1;
+        int totalArticles = 0;
+        string[] newsArticles;
         public Form1()
         {
             InitializeComponent();
@@ -23,17 +26,13 @@ namespace testSharp
         private void button1_Click(object sender, EventArgs e)
         {
             try {
-                //getting id of game from input box
+                //initaliazing gameId
                 int gameId = 0;
-                try
-                {
-                    gameId = int.Parse(txtGameId.Text);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show("Game ID must be number");
-                }
+                //getting id of game from input box
+                gameId = int.Parse(txtGameId.Text);
+                
 
+                //client and request setup
                 var client = new RestClient("http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?");
                 var request = new RestRequest();
 
@@ -41,27 +40,37 @@ namespace testSharp
                 //string key = "71897F1E822664717BC6FEFAE509510A";
                 //request.AddParameter("api key", key);
                 request.AddParameter("appid", gameId);
-                request.AddParameter("count", "3");
-                request.AddParameter("maxlength", "300");
+                request.AddParameter("count", "10"); //max amount of news articles to bring back
+                request.AddParameter("maxlength", "600"); //max amount of characters taken from news article
                 request.AddParameter("format", "json");
 
                 // Service call
                 var response = client.Execute(request);
-
-
+                
                 JsonDeserializer deserializer = new JsonDeserializer();
-
+                //setting up contents or response neatly
                 var temp = new RootObject();
                 temp = deserializer.Deserialize<RootObject>(response);
                 var news = temp.appNews.newsItems;
 
-                foreach (newsitems n in news)
-                {
-                    MessageBox.Show(n.contents);
+                newsArticles = new string[news.Count+1];
+                totalArticles = news.Count;
+                currArticle = 0;
+                
+                for(int i = 0; i < news.Count; i++){
+                    newsArticles[i] = news[i].toString();
                 }
-            }catch(Exception ex)
+                
+                
+                txtNewsBox.Text = newsArticles[currArticle];
+                labelPageNum.Text = (currArticle + 1) + "/" + totalArticles;
+            }
+            catch (FormatException)
             {
-                MessageBox.Show("Error");
+                MessageBox.Show("Game ID must be number");
+            }catch(NullReferenceException nullEx)
+            {
+                MessageBox.Show("No Game with that id");
             }
         }
 
@@ -82,10 +91,47 @@ namespace testSharp
             public int date { get; set; }
             public string feedname { get; set; }
 
-    }
+            public string toString()
+            {
+                var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(Math.Round(date / 1000d)).ToLocalTime();
+                return "" + title + "\r\n" + dt + "\r\nAuthor: " + author + "\r\n\r\n" + contents;
+            }
+        }
         public class RootObject
         {
             public appnews appNews { get; set; }
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            if (totalArticles >= 0)
+            {
+                if (currArticle == totalArticles-1)
+                {
+                    currArticle = 0;
+                }else
+                {
+                    currArticle = currArticle + 1;
+                }
+                txtNewsBox.Text = newsArticles[currArticle];
+                labelPageNum.Text = (currArticle + 1) + "/" + totalArticles;
+            }
+        }
+
+        private void btnPrev_Click(object sender, EventArgs e)
+        {
+            if (totalArticles >= 0)
+            {
+                if (currArticle == 0)
+                {
+                    currArticle = totalArticles - 1;
+                }else
+                {
+                    currArticle = currArticle - 1;
+                }
+                txtNewsBox.Text = newsArticles[currArticle];
+                labelPageNum.Text = (currArticle + 1) + "/" + totalArticles;
+            }
         }
     }
 }
