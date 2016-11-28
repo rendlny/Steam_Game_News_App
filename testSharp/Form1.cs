@@ -65,7 +65,7 @@ namespace testSharp
 
 private void btnNext_Click(object sender, EventArgs e)
         {
-            if (totalArticles >= 0)
+            if (totalArticles > 0)
             {
                 if (currArticle == totalArticles - 1)
                 {
@@ -81,7 +81,7 @@ private void btnNext_Click(object sender, EventArgs e)
 
         private void btnPrev_Click(object sender, EventArgs e)
         {
-            if (totalArticles >= 0)
+            if (totalArticles > 0)
             {
                 if (currArticle == 0)
                 {
@@ -106,9 +106,6 @@ private void btnNext_Click(object sender, EventArgs e)
             {
                 //initaliazing gameId
                 int gameId = 0;
-
-
-                //SECOND REST -- SECOND REST -- SECOND REST -- SECOND REST -- SECOND REST -- SECOND REST -- 
 
                 //getting id of game from input box
                 gameId = int.Parse(txtGameId.Text);
